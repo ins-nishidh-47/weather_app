@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .header .sun-icon {
+            width: 40px;
+            height: 40px;
+            color: #fde047;
+        }
+
+        .search-form {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .search-input {
+            position: relative;
+        }
+
+        .search-input input {
+            padding-left: 40px;
+            padding-right: 16px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 256px;
+            backdrop-filter: blur(4px);
+            font-size: 16px;
+        }
+
+        .search-input input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-input input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 10px;
+            width: 20px;
+            height: 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .add-btn {
+            padding: 8px 24px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .add-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .weather-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .weather-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .weather-cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .weather-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 24px;
+            color: white;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .weather-card:hover {
+            transform: scale(1.05);
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .weather-card:hover .remove-btn {
+            opacity: 1;
+        }
+
+        .remove-icon {
+            width: 20px;
+            height: 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .remove-icon:hover {
+            color: white;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .card-header p {
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: capitalize;
+        }
+
+        .weather-icon {
+            width: 64px;
+            height: 64px;
+        }
+
+        .card-details {
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .temperature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .thermometer-icon {
+            width: 20px;
+            height: 20px;
+            color: #fca5a5;
+        }
+
+        .temperature-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .weather-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .wind-icon, .humidity-icon {
+            width: 16px;
+            height: 16px;
+            color: #bfdbfe;
+        }
+
+        .feels-like {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px;
+        }
+
+        .error-message {
+            color: #fca5a5;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="m4.93 4.93 1.41 1.41"></path>
+                <path d="m17.66 17.66 1.41 1.41"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+                <path d="m6.34 17.66-1.41 1.41"></path>
+                <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+            <h1>Weather Dashboard</h1>
+        </div>
+
+        <form method="POST" class="search-form">
+            {% csrf_token %}
+            <div class="search-input">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                </svg>
+                <input type="text" name="city" placeholder="Enter city name" required>
+            </div>
+            <button type="submit" class="add-btn">Add City</button>
+        </form>
+
+        <div class="weather-cards">
+            {% for weather in weather_data %}
+            <div class="weather-card">
+                <a href="{% url 'delete_city' weather.city %}" class="remove-btn">
+                    <svg class="remove-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </a>
+                
+                <div class="card-header">
+                    <div>
+                        <h2>{{ weather.city }}</h2>
+                        <p>{{ weather.description }}</p>
+                    </div>
+                    <img src="http://openweathermap.org/img/w/{{ weather.icon }}.png" alt="{{ weather.description }}" class="weather-icon">
+                </div>
+                
+                <div class="card-details">
+                    <div class="temperature">
+                        <svg class="thermometer-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
+                        </svg>
+                        <span class="temperature-value">{{ weather.temperature|floatformat:0 }}°C</span>
+                    </div>
+                    
+                    <div class="weather-stats">
+                        <div class="stat">
+                            <svg class="thermometer-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
+                            </svg>
+                            <span>Feels like: {{ weather.feels_like|floatformat:0 }}°C</span>
+                        </div>
+                        <div class="stat">
+                            <svg class="wind-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"></path>
+                                <path d="M9.6 4.6A2 2 0 1 1 11 8H2"></path>
+                                <path d="M12.6 19.4A2 2 0 1 0 14 16H2"></path>
+                            </svg>
+                            <span>Wind: {{ weather.wind_speed }} km/h</span>
+                        </div>
+                        <div class="stat">
+                            <svg class="humidity-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"></path>
+                                <path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"></path>
+                            </svg>
+                            <span>Humidity: {{ weather.humidity }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="error-message">No cities added yet. Search for a city to see its weather!</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
